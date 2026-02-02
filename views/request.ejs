@@ -73,7 +73,7 @@
         <p><b>ID:</b> <%= request.id %></p>
         <p><b>Method:</b> <%= request.method %></p>
         <p><b>Path:</b> <%= request.path %></p>
-        <p><b>Timestamp:</b> <%= new Date(request.startTime).toLocaleString() %></p>
+        <p><b>Timestamp:</b> <%= new Date(request.startTime).toLocaleString("fr") %></p>
         <p><b>Execution Time:</b> <%= request.responseTime %>ms</p>
       </div>
 
