@@ -52,6 +52,9 @@ const { argv } = yargs
   .option('show-traffic', {
     describe: 'Show traffic in a web browser',
   })
+  .option('traffic-inspector-port', {
+    describe: 'The port for the traffic inspector web interface',
+  })
   .require('port')
   .boolean('local-https')
   .boolean('allow-invalid-cert')
@@ -78,6 +81,7 @@ if (typeof argv.port !== 'number') {
     local_ca: argv.localCa,
     allow_invalid_cert: argv.allowInvalidCert,
     show_traffic: argv.showTraffic,
+    traffic_inspector_port: argv.trafficInspectorPort,
   }).catch(err => {
     throw err;
   });

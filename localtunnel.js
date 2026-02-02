@@ -7,7 +7,7 @@ module.exports = function localtunnel(arg1, arg2, arg3) {
   const client = new Tunnel(options);
 
   if (options.show_traffic) {
-    const webInterface = new WebInterface(client);
+    const webInterface = new WebInterface(client, options.traffic_inspector_port);
     webInterface.start();
   }
 

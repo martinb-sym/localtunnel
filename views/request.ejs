@@ -69,16 +69,16 @@
 
     <div class="container">
       <div class="card">
-        <h3>Generic</h3>
+        <h3>Details</h3>
         <p><b>ID:</b> <%= request.id %></p>
+        <p><b>Method:</b> <%= request.method %></p>
+        <p><b>Path:</b> <%= request.path %></p>
         <p><b>Timestamp:</b> <%= new Date(request.startTime).toLocaleString() %></p>
         <p><b>Execution Time:</b> <%= request.responseTime %>ms</p>
       </div>
 
       <div class="card">
         <h3>Request</h3>
-        <p><b>Method:</b> <%= request.method %></p>
-        <p><b>Path:</b> <%= request.path %></p>
         <h4>Headers</h4>
         <table>
           <% for (const key in request.headers) { %>
@@ -121,7 +121,7 @@
             </tr>
           <% } %>
         </table>
-        <% if (request.responseBody) { %>
+        <% if (request.responseBody && request.method !== 'HEAD') { %>
         <h4>Body</h4>
         <%
           const responseContentType = getHeader(request.responseHeaders, 'content-type') || '';
