@@ -39,6 +39,7 @@
     <table id="traffic-table">
       <tr>
         <th>ID</th>
+        <th>Timestamp</th>
         <th>Method</th>
         <th>Path</th>
         <th>Response Status</th>
@@ -47,6 +48,7 @@
       <% requests.forEach(request => { %>
         <tr>
           <td><a href="/request/<%= request.id %>"><%= request.id %></a></td>
+          <td><%= new Date(request.startTime).toLocaleString() %></td>
           <td><%= request.method %></td>
           <td><%= request.path %></td>
           <td><%= request.responseStatus %></td>
@@ -63,6 +65,7 @@
         const row = table.insertRow(1);
         row.innerHTML = `
           <td><a href="/request/${request.id}">${request.id}</a></td>
+          <td>${new Date(request.startTime).toLocaleString()}</td>
           <td>${request.method}</td>
           <td>${request.path}</td>
           <td>${request.responseStatus}</td>
