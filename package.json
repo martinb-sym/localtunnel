@@ -23,7 +23,10 @@
   "dependencies": {
     "axios": "0.21.4",
     "debug": "4.3.2",
+    "ejs": "^4.0.1",
+    "http-parser-js": "0.5.8",
     "openurl": "1.1.1",
+    "uuid": "8.3.2",
     "yargs": "17.1.1"
   },
   "devDependencies": {

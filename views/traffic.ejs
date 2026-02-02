@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <title>Localtunnel Traffic</title>
+    <style>
+      :root {
+        --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --background-color: #ffffff;
+        --text-color: #24292e;
+        --border-color: #e1e4e8;
+        --header-bg: #f6f8fa;
+      }
+      body {
+        font-family: var(--font-family);
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 2em;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      table, th, td {
+        border: 1px solid var(--border-color);
+      }
+      th, td {
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        background-color: var(--header-bg);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Localtunnel Traffic</h1>
+    <button onClick="window.location.reload()">Refresh</button>
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Method</th>
+        <th>Path</th>
+        <th>Response Status</th>
+        <th>Response Time</th>
+      </tr>
+      <% requests.forEach(request => { %>
+        <tr>
+          <td><a href="/request/<%= request.id %>"><%= request.id %></a></td>
+          <td><%= request.method %></td>
+          <td><%= request.path %></td>
+          <td><%= request.responseStatus %></td>
+          <td><%= request.responseTime %>ms</td>
+        </tr>
+      <% }); %>
+    </table>
+  </body>
+</html>

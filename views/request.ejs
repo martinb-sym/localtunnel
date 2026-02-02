@@ -1,0 +1,150 @@
+<html>
+  <head>
+    <title>Request Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+      :root {
+        --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        --background-color: #ffffff;
+        --text-color: #24292e;
+        --border-color: #e1e4e8;
+        --pre-bg: #f6f8fa;
+      }
+      body {
+        font-family: var(--font-family);
+        background-color: var(--background-color);
+        color: var(--text-color);
+        margin: 2em;
+      }
+      pre { 
+        padding: 1em;
+        border-radius: 6px;
+        background-color: var(--pre-bg);
+        border: 1px solid var(--border-color);
+      }
+      .container {
+        display: grid;
+        grid-gap: 1em;
+      }
+      .card {
+        padding: 1em;
+        border-radius: 6px;
+        background-color: var(--pre-bg);
+        border: 1px solid var(--border-color);
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+      table, th, td {
+        border: 1px solid var(--border-color);
+      }
+      th, td {
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        background-color: var(--header-bg);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Request Details</h1>
+    <a href="/">Back to Traffic</a>
+
+    <%
+      const getHeader = (headers, name) => {
+        const lowerName = name.toLowerCase();
+        for (const key in headers) {
+          if (key.toLowerCase() === lowerName) {
+            return headers[key];
+          }
+        }
+        return null;
+      };
+    %>
+
+    <div class="container">
+      <div class="card">
+        <h3>Generic</h3>
+        <p><b>ID:</b> <%= request.id %></p>
+        <p><b>Timestamp:</b> <%= new Date(request.startTime).toLocaleString() %></p>
+        <p><b>Execution Time:</b> <%= request.responseTime %>ms</p>
+      </div>
+
+      <div class="card">
+        <h3>Request</h3>
+        <p><b>Method:</b> <%= request.method %></p>
+        <p><b>Path:</b> <%= request.path %></p>
+        <h4>Headers</h4>
+        <table>
+          <% for (const key in request.headers) { %>
+            <tr>
+              <td><b><%= key %></b></td>
+              <td><%= Array.isArray(request.headers[key]) ? request.headers[key].join(', ') : request.headers[key] %></td>
+            </tr>
+          <% } %>
+        </table>
+        <% if (request.body) { %>
+        <h4>Body</h4>
+        <%
+          const contentType = getHeader(request.headers, 'content-type') || '';
+          if (contentType.includes('application/json')) {
+        %>
+          <pre><code class="json"><%= JSON.stringify(JSON.parse(request.body.toString()), null, 2) %></code></pre>
+        <%
+          } else if (contentType.startsWith('image/')) {
+        %>
+          <img src="data:<%= contentType %>;base64,<%= request.body.toString('base64') %>" />
+        <%
+          } else {
+        %>
+          <pre><%= request.body.toString() %></pre>
+        <%
+          }
+        %>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>Response</h3>
+        <p><b>Status:</b> <%= request.responseStatus %></p>
+        <h4>Headers</h4>
+        <table>
+          <% for (const key in request.responseHeaders) { %>
+            <tr>
+              <td><b><%= key %></b></td>
+              <td><%= Array.isArray(request.responseHeaders[key]) ? request.responseHeaders[key].join(', ') : request.responseHeaders[key] %></td>
+            </tr>
+          <% } %>
+        </table>
+        <% if (request.responseBody) { %>
+        <h4>Body</h4>
+        <%
+          const responseContentType = getHeader(request.responseHeaders, 'content-type') || '';
+          if (responseContentType.includes('application/json')) {
+        %>
+          <pre><code class="json"><%= JSON.stringify(JSON.parse(request.responseBody.toString()), null, 2) %></code></pre>
+        <%
+          } else if (responseContentType.startsWith('image/')) {
+        %>
+          <img src="data:<%= responseContentType %>;base64,<%= request.responseBody.toString('base64') %>" />
+        <%
+          } else {
+        %>
+          <pre><%= request.responseBody.toString() %></pre>
+        <%
+          }
+        %>
+        <% } %>
+      </div>
+    </div>
+
+    <script>
+      hljs.highlightAll();
+    </script>
+  </body>
+</html>

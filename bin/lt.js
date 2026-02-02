@@ -49,10 +49,14 @@ const { argv } = yargs
   .option('print-requests', {
     describe: 'Print basic request info',
   })
+  .option('show-traffic', {
+    describe: 'Show traffic in a web browser',
+  })
   .require('port')
   .boolean('local-https')
   .boolean('allow-invalid-cert')
   .boolean('print-requests')
+  .boolean('show-traffic')
   .help('help', 'Show this help and exit')
   .version(version);
 
@@ -73,6 +77,7 @@ if (typeof argv.port !== 'number') {
     local_key: argv.localKey,
     local_ca: argv.localCa,
     allow_invalid_cert: argv.allowInvalidCert,
+    show_traffic: argv.showTraffic,
   }).catch(err => {
     throw err;
   });
