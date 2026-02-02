@@ -36,7 +36,7 @@
   <body>
     <h1>Localtunnel Traffic</h1>
     <button onClick="window.location.reload()">Refresh</button>
-    <table>
+    <table id="traffic-table">
       <tr>
         <th>ID</th>
         <th>Method</th>
@@ -54,5 +54,21 @@
         </tr>
       <% }); %>
     </table>
+    <script>
+      const eventSource = new EventSource('/events');
+      const table = document.getElementById('traffic-table');
+
+      eventSource.onmessage = (event) => {
+        const request = JSON.parse(event.data);
+        const row = table.insertRow(1);
+        row.innerHTML = `
+          <td><a href="/request/${request.id}">${request.id}</a></td>
+          <td>${request.method}</td>
+          <td>${request.path}</td>
+          <td>${request.responseStatus}</td>
+          <td>${request.responseTime}ms</td>
+        `;
+      };
+    </script>
   </body>
 </html>
