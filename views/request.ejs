@@ -49,6 +49,19 @@
       th {
         background-color: var(--header-bg);
       }
+      button {
+        background-color: var(--header-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        padding: 8px 16px;
+        font-family: var(--font-family);
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 1em;
+      }
+      button:hover {
+        background-color: #f0f0f0;
+      }
     </style>
   </head>
   <body>
@@ -75,6 +88,7 @@
         <p><b>Path:</b> <%= request.path %></p>
         <p><b>Timestamp:</b> <%= new Date(request.startTime).toLocaleString("fr") %></p>
         <p><b>Execution Time:</b> <%= request.responseTime %>ms</p>
+        <button id="copy-curl">Copy as cURL</button>
       </div>
 
       <%
@@ -162,6 +176,37 @@
 
     <script>
       hljs.highlightAll();
+
+      const copyCurlBtn = document.getElementById('copy-curl');
+      copyCurlBtn.addEventListener('click', () => {
+        const method = '<%= request.method %>';
+        const url = `https://<%= request.headers.host %><%- request.path %>`;
+        const headers = <%- JSON.stringify(request.headers) %>;
+        const body = <%- request.body ? `'` + request.body.toString().replace(/'/g, "\\'")+ `'` : `''` %>;
+
+        let curlCmd = `curl -X ${method} '${url}'`;
+
+        for (const key in headers) {
+          if (key.toLowerCase() === 'host') {
+            continue;
+          }
+          const value = Array.isArray(headers[key]) ? headers[key].join(', ') : headers[key];
+          curlCmd += ` \\\n  -H '${key}: ${value.replace(/'/g, "'\\''")}'`;
+        }
+
+        if (body) {
+          curlCmd += ` \\\n  --data-binary '${body.replace(/'/g, "'\\''")}'`;
+        }
+
+        navigator.clipboard.writeText(curlCmd).then(() => {
+          copyCurlBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyCurlBtn.textContent = 'Copy as cURL';
+          }, 2000);
+        }, () => {
+          copyCurlBtn.textContent = 'Failed to copy';
+        });
+      });
     </script>
   </body>
 </html>
