@@ -77,6 +77,23 @@
         <p><b>Execution Time:</b> <%= request.responseTime %>ms</p>
       </div>
 
+      <%
+        const queryParams = new URLSearchParams(request.path.split('?')[1]);
+      %>
+      <% if ([...queryParams.entries()].length > 0) { %>
+      <div class="card">
+        <h3>Query Parameters</h3>
+        <table>
+          <% for (const [key, value] of queryParams.entries()) { %>
+            <tr>
+              <td><b><%= key %></b></td>
+              <td><%= value %></td>
+            </tr>
+          <% } %>
+        </table>
+      </div>
+      <% } %>
+
       <div class="card">
         <h3>Request</h3>
         <h4>Headers</h4>
