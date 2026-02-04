@@ -8,6 +8,18 @@
         --text-color: #24292e;
         --border-color: #e1e4e8;
         --header-bg: #f6f8fa;
+        --input-bg: #ffffff;
+        --input-border: #d1d5da;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background-color: #0d1117;
+          --text-color: #c9d1d9;
+          --border-color: #30363d;
+          --header-bg: #161b22;
+          --input-bg: #0d1117;
+          --input-border: #30363d;
+        }
       }
       body {
         font-family: var(--font-family);
@@ -31,6 +43,24 @@
       th {
         background-color: var(--header-bg);
       }
+      a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      th select, th input[type="text"] {
+        background-color: var(--input-bg);
+        border: 1px solid var(--input-border);
+        color: var(--text-color);
+        padding: 4px 8px;
+        border-radius: 6px;
+        margin-left: 8px;
+      }
+      th input[type="text"] {
+        width: 100px;
+      }
     </style>
   </head>
   <body>
@@ -42,10 +72,23 @@
       <tr>
         <th>ID</th>
         <th>Timestamp</th>
-        <th>Method</th>
-        <th>Path</th>
+        <th>
+          Method
+          <select id="method-filter">
+            <option value="">All</option>
+          </select>
+        </th>
+        <th>
+          Path
+          <input type="text" id="path-filter" placeholder="Filter...">
+        </th>
         <th>Query</th>
-        <th>Response Status</th>
+        <th>
+          Response Status
+          <select id="status-filter">
+            <option value="">All</option>
+          </select>
+        </th>
         <th>Response Time</th>
       </tr>
       <% requests.forEach(request => { %>
@@ -68,6 +111,71 @@
     <script>
       const eventSource = new EventSource('/events');
       const table = document.getElementById('traffic-table');
+      const methodFilter = document.getElementById('method-filter');
+      const pathFilter = document.getElementById('path-filter');
+      const statusFilter = document.getElementById('status-filter');
+
+      function populateFilters() {
+        const methods = new Set();
+        const statuses = new Set();
+
+        for (let i = 1; i < table.rows.length; i++) {
+          const row = table.rows[i];
+          methods.add(row.cells[2].textContent);
+          statuses.add(row.cells[5].textContent);
+        }
+
+        const selectedMethod = methodFilter.value;
+        methodFilter.innerHTML = '<option value="">All</option>';
+        methods.forEach(method => {
+          const option = document.createElement('option');
+          option.value = method;
+          option.textContent = method;
+          if (method === selectedMethod) {
+            option.selected = true;
+          }
+          methodFilter.appendChild(option);
+        });
+
+        const selectedStatus = statusFilter.value;
+        statusFilter.innerHTML = '<option value="">All</option>';
+        statuses.forEach(status => {
+          const option = document.createElement('option');
+          option.value = status;
+          option.textContent = status;
+          if (status === selectedStatus) {
+            option.selected = true;
+          }
+          statusFilter.appendChild(option);
+        });
+      }
+
+      function filterTable() {
+        const methodValue = methodFilter.value.toLowerCase();
+        const pathValue = pathFilter.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+
+        for (let i = 1; i < table.rows.length; i++) {
+          const row = table.rows[i];
+          const method = row.cells[2].textContent.toLowerCase();
+          const path = row.cells[3].textContent.toLowerCase();
+          const status = row.cells[5].textContent.toLowerCase();
+
+          const methodMatch = methodValue === '' || method === methodValue;
+          const pathMatch = path.includes(pathValue);
+          const statusMatch = statusValue === '' || status === statusValue;
+
+          if (methodMatch && pathMatch && statusMatch) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        }
+      }
+
+      methodFilter.addEventListener('change', filterTable);
+      pathFilter.addEventListener('input', filterTable);
+      statusFilter.addEventListener('change', filterTable);
 
       eventSource.onmessage = (event) => {
         const request = JSON.parse(event.data);
@@ -84,7 +192,11 @@
           <td>${request.responseStatus}</td>
           <td>${request.responseTime}ms</td>
         `;
+        populateFilters();
+        filterTable();
       };
+
+      populateFilters();
     </script>
   </body>
 </html>
